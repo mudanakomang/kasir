@@ -75,8 +75,8 @@
                                                         <td>{{ $produk->nama }}</td>
                                                         <td>{{ $produk->pivot->jumlah }}</td>
                                                         <td>{{ $produk->satuan }}</td>
-                                                        <td>{{ $produk->harga }}</td>
-                                                        <td>{{ $produk->pivot->diskon }}</td>
+                                                        <td>{{ "Rp ".number_format($produk->harga,0,",",".") }}</td>
+                                                        <td>{{ $produk->pivot->diskon." %" }}</td>
                                                         <td>{{ "Rp ".number_format($produk->subtotal,0,",",".") }}</td>
                                                     </tr>
                                                     @endforeach
