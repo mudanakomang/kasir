@@ -38,10 +38,11 @@
                                 <th>No</th>
                                 <th>Kode</th>
                                 <th>No Polisi</th>
+                                <th>Guide</th>
                                 <th>Tipe Pembayaran</th>
-                                <th>Jumlah Pembayaran</th>
-                                <th>Status</th>
-                                <th>#</th>
+                                <th>Total Belanja</th>
+                                <th>Jumlah Pembayaran</th>                                
+                              
                                 </thead>
                             </table>
                         </div>
@@ -52,5 +53,45 @@
     </section>
 @endsection
 @section('script')
+<script>
+function loadTransaksi(){
+        $('#transaksi').DataTable({
+            serverSide:true,
+            ordering:true,
+            processing:true,
+            ajax:{
+                url:'{{ route('listtransaksi') }}',
+                type:'POST',
+                data:{
+                    _token:'{{ csrf_token() }}',
+                    tipe:'{{ $tipe }}'
+                }
+            },
+            columns:[
+                {data:'id'},
+                {data:'kode'},
+                {data:'nopol'},
+                {data:'guide'},
+                {data:'tipe_byr'},
+                {data:'total'},
+                {data:'jumlah_byr'},                
+            ],columnDefs:[{
+                    targets:[5,6],
+                    render: $.fn.dataTable.render.number( '.', ',', 0,'Rp. ' )
+                },{
+                    targets:1,
+                    render:function(data,type,row){
+                        return "<a href='{{ url('transaksi/detail')}}/"+data+"'>"+data+"</a>"
+                    }
+                }
+            ]        
+        })
+    }
+    function detailTrx(id){
 
+    }
+    $(document).ready(function(){
+        loadTransaksi()
+    })
+</script>
 @endsection

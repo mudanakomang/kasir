@@ -23,8 +23,11 @@ Route::group(['middleware'=>['auth']],function (){
     Route::post('savenopol','KendaraanController@savenopol')->name('savenopol');
     Route::post('deletenopol','KendaraanController@deletenopol')->name('deletenopol');
 
-    Route::get('transaksi','TransaksiController@index')->name('transaksi');
+    Route::get('transaksi/t/{tipe}','TransaksiController@index')->name('transaksi');
+    Route::get('transaksi/detail/{kode}','TransaksiController@detail')->name('detail');
+    Route::post('listtransaksi','TransaksiController@listtransaksi')->name('listtransaksi');
     Route::get('transaksi/add','TransaksiController@add')->name('addtransaksi');
+    Route::post('transaksi/lanjuttrx','TransaksiController@lanjuttrx')->name('lanjuttrx');
     Route::post('transaksi/store','TransaksiController@store')->name('storetransaksi');
     Route::post('transaksi/getkodetrx','TransaksiController@getkodetrx')->name('getkodetrx');
     Route::post('transaksi/updatetrx','TransaksiController@updatetrx')->name('updatetrx');

@@ -11,7 +11,7 @@ class Transaksi extends Model
     protected $fillable=['kode','nopol','tipe_byr','total','jumlah_byr','status'];
 
     public function produk(){
-        return $this->belongsToMany(Produk::class)->withPivot('jumlah');
+        return $this->belongsToMany(Produk::class)->withPivot(['jumlah','diskon']);
     }
     public function user(){
         return $this->belongsToMany(User::class);

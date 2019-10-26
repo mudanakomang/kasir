@@ -47,13 +47,13 @@
             </a>
             <ul class="nav nav-treeview">
                 <li class="nav-item">
-                    <a href="{{ url('transaksi') }}" class="nav-link">
+                    <a href="{{ url('transaksi/t/selesai') }}" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Data Transaksi</p>
+                        <p>Transaksi Selesai</p>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ url('transaksi/pending') }}" class="nav-link">
+                    <a href="{{ url('transaksi/t/pending') }}" class="nav-link">
                         <i class="far fa-circle nav-icon"></i>
                         <p>Transaksi Pending</p>
                     </a>

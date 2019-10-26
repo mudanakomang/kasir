@@ -26,7 +26,7 @@ class AddPrintToTransaksi extends Migration
     public function down()
     {
         Schema::table('transaksi', function (Blueprint $table) {
-            $table->dropClumn('print');
+            $table->dropColumn('print');
         });
     }
 }

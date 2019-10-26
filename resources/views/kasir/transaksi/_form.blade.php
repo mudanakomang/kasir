@@ -5,7 +5,7 @@
 
     <div class="form-group row">
         {!! Form::label('nopol','Nomor kendaraan',['class'=>'col-sm-3']) !!}
-        {!!  Form::select('nopol',[''=>'Cari Nomor Kendaraan']+\App\Kendaraan::pluck('nopol', 'nopol')->all(),null, ['class'=>'col-sm-4 form-control select2','id'=>'nopol','onchange'=>'updateNopol(this.value)'])!!}
+        {!! Form::select('nopol',[''=>'Cari Nomor Kendaraan']+\App\Kendaraan::whereDate('created_at', '=', date('Y-m-d'))->pluck('nopol', 'nopol')->all(),null, ['class'=>'col-sm-4 form-control select2','id'=>'nopol','onchange'=>'updateNopol(this.value)'])!!}
     </div>
     <div class="form-group row">
         {!! Form::label('guide_id','Guide',['class'=>'col-sm-3']) !!}
@@ -15,7 +15,7 @@
 
         {!! Form::hidden('kode',null,['id'=>'kode']) !!}
         {!! Form::label('produk','Produk',['class'=>'col-sm-3']) !!}
-        {!! Form::select('produk',[''=>'Cari Produk']+\App\Produk::select(DB::raw("CONCAT(kode,' | ',nama) AS nama"),'id')->pluck('nama', 'id')->all(),null, ['class'=>$errors->has('produk') ? 'col-sm-8 form-control is-invalid select2':'col-sm-8 form-control select2','onchange'=>'updateTrx()','id'=>'produk'])!!}
+        {!! Form::select('produk',[''=>'Cari Produk']+\App\Produk::where('stok','>',0)->select(DB::raw("CONCAT(kode,' | ',nama) AS nama"),'id')->pluck('nama', 'id')->all(),null, ['class'=>$errors->has('produk') ? 'col-sm-8 form-control is-invalid select2':'col-sm-8 form-control select2','onchange'=>'updateTrx()','id'=>'produk'])!!}
 
     </div>
 </form>
@@ -69,7 +69,21 @@
                            byr:byr,
                            total:total,
                        },success:function(e){
-                            console.log(e);
+                            if(e==='OK'){
+                                Swal.fire({
+                                title: 'Struk dicetak',
+                                text: "Buat transaski baru?",
+                                type: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'OK'
+                                }).then((result) => {
+                                if (result.value) {
+                                    $('#selesai').click();
+                                }
+                                })
+                            }
                        }
                    })
                 }
@@ -97,18 +111,18 @@
                         kode:$('#kode').val()
                     },success:function(data){
                         if(data==='ok'){
-                            loadtable()
+                            location.reload()
                         }
                     }
                 })
             })
             function hitungTotal(){
-                $('#kembali').html("Rp 0")               
+               $('#kembali').html("Rp 0")               
                var tipe = $('#tipe_byr').val()
                var byr=parseInt($('#jumlah_byr').val().replace(/\,/g,'').replace(/\./g,''))               
                var total=parseInt($('#totalbelanja').text().replace('Rp ','').replace(/\,/g,'').replace(/\./g,''))                           
                if(tipe==='cash' || tipe===''){
-                   console.log(byr +  ' '+total)
+                   console.log(byr +  ' '+tipe)
                     if(byr>total){
                         var kembali=byr-total;
                             $('#kembali').html("Rp "+ $.number(kembali,0,'.'))
@@ -277,18 +291,19 @@
                             });
 
                     } else {                        
+                        console.log(data);
                         $('#jumlah_byr').val($.number(data.jumlah_byr,0,','))
-                        $('#tipe_byr').select2({
-                            placeholder: "Jenis Pembayaran",
-                            theme:'bootstrap4',
-                           // allowClear:true,
-                            initSelection: function(element, callback) {
-                                if(data.tipe_byr){
-                                    console.log(data.tipe_byr)
-                                    callback({id: data.tipe_byr, text: data.tipe_byr.charAt(0).toUpperCase() + data.tipe_byr.slice(1) });
-                                }                               
-                            }
-                        })
+                        // $('#tipe_byr').select2({
+                        //     placeholder: "Jenis Pembayaran",
+                        //     theme:'bootstrap4',
+                        //    // allowClear:true,
+                        //     initSelection: function(element, callback) {
+                        //         if(data.tipe_byr){
+                        //             console.log(data.tipe_byr)
+                        //             callback({id: data.tipe_byr, text: data.tipe_byr.charAt(0).toUpperCase() + data.tipe_byr.slice(1) });
+                        //         }                               
+                        //     }
+                        // })
                         $("#nopol").select2({
                             placeholder: "Pilih nomor kendaraan",
                             theme:'bootstrap4',
@@ -347,7 +362,7 @@
                         },{
                             targets:5,
                             render:function(data){                             
-                                return "<input type=number name=diskon style=width:45px step=5 id="+data.id+" value="+data.diskon+" autocomplete='off' onchange='updateDiskon(this.id,this.value)' oninput='this.onchange()'   > %"
+                                return "<input type=number name=diskon style=width:45px step=5 id="+data.id+" value="+data.pivot.diskon+" autocomplete='off' onchange='updateDiskon(this.id,this.value)' oninput='this.onchange()'   > %"
                             }
                         },{
                                 targets:7,

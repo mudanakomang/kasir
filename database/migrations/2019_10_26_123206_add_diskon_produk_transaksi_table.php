@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDiskonToProduk extends Migration
+class AddDiskonProdukTransaksiTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,8 @@ class AddDiskonToProduk extends Migration
      */
     public function up()
     {
-        Schema::table('produk', function (Blueprint $table) {
-            //
-            $table->float('diskon',10,2)->after('harga')->nullable()->default(0);
+        Schema::table('produk_transaksi', function (Blueprint $table) {
+            $table->float('diskon',10,2)->after('jumlah')->nullable()->default(0);
         });
     }
 
@@ -26,7 +25,7 @@ class AddDiskonToProduk extends Migration
      */
     public function down()
     {
-        Schema::table('produk', function (Blueprint $table) {
+        Schema::table('produk_transaksi', function (Blueprint $table) {
             //
             $table->dropColumn('diskon');
         });

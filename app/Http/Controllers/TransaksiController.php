@@ -10,9 +10,54 @@ use Illuminate\Support\Facades\Auth;
 class TransaksiController extends Controller
 {
     //
-    public function index(){
+    public function index($tipe){            
+        return view('kasir.transaksi.index',['tipe'=>$tipe]);
+    }
+    public function detail($kode){
+        $data=Transaksi::where('kode','=',$kode)->with(['produk'=>function($q){
+            $q->selectRaw('produk.*,jumlah * (harga-(harga*diskon/100)) as subtotal');
+        }])->with('guide')->first();           
+        return view('kasir.transaksi.detail',['data'=>$data,'action'=>'TransaksiController@store']);
+    }
+    public function listtransaksi(Request $request){
+        $draw=$request->draw;
+        $length=$request->length;
+        $start=$request->start;
+        $search=$request->search['value'];
+        $columnIndex = $request->order[0]['column'];
+        $columnName = $request->columns[$columnIndex]['data'];
+        $columnSortOrder = $request->order[0]['dir'];
+        $total=Transaksi::with('produk')->with('guide')->where('status','=',$request->tipe)->count();
+        $trx=Transaksi::with('produk')->with('guide')->limit($length,$start)->where('status','=',$request->tipe)->orderBy($columnName,$columnSortOrder)->get();
+        $output=[];
+        $output['draw']=$draw;
+        $output['recordsTotal']=$total;
+        $output['recordsFiltered']=$total;
+        $output['data']=[];
 
-        return view('kasir.transaksi.index');
+        if (!empty($search)){
+             $trx=Transaksi::with('produk')
+                 ->where('kode','LIKE',"%$search%")
+                ->orWhere('nopol','LIKE',"%$search%")
+                ->orWhere('tipe_byr','LIKE',"%$search%")
+                ->orWhere('total','LIKE',"%$search%") 
+                ->orWhere('jumlah_byr','LIKE',"%$search%")              
+                ->limit($length,$start)->with('guide')->where('status','=',$request->tipe)->orderBy($columnName,$columnSortOrder)->get();
+                $output['recordsTotal']=$trx->count();
+                $output['recordsFiltered']=$trx->count();
+        }
+        foreach ($trx as $key=>$prd){
+            $subdata['id']=$key+1;
+            $subdata['trid']=$prd->id;
+            $subdata['kode']=$prd->kode;
+            $subdata['nopol']=$prd->nopol;
+            $subdata['guide']=$prd->guide->name;
+            $subdata['tipe_byr']=$prd->tipe_byr;
+            $subdata['total']=$prd->total;
+            $subdata['jumlah_byr']=$prd->jumlah_byr;           
+            $output['data'][]=$subdata;
+        }
+        return response(json_encode($output));
     }
     public function add(){
         $data=Transaksi::where('status','=','proses')->first();
@@ -31,6 +76,11 @@ class TransaksiController extends Controller
         $kode=sprintf('TRX-%08d',$id);
         $trx=Transaksi::create(['kode'=>$kode,'status'=>'proses']);
         return response($trx);
+    }
+    public function lanjuttrx(Request $request){
+        Transaksi::where('status','=','proses')->delete();
+        Transaksi::where('kode','=',$request->kode)->update(['status'=>'proses']);
+        return response('ok');
     }
     public function updatetrx(Request $request)
     {
@@ -86,7 +136,7 @@ class TransaksiController extends Controller
         $trx=Transaksi::with(['produk'=>function($q) use ($request){
             $q->where('id','=',$request->produk);
         }])->where('kode','=',$request->kode)->first();
-        $trx->produk()->where('id','=',$request->produk)->update(['diskon'=>$request->diskon]);
+        $trx->produk()->updateExistingPivot($request->produk,['diskon'=>$request->diskon]);;
         return response('ok');
     }
     public function hapusproduk(Request $request){
@@ -125,6 +175,10 @@ class TransaksiController extends Controller
     public function finish(Request $request){
         $trx=Transaksi::where('kode','=',$request->kode)->where('print','=','1')->first();    
         if(!empty($trx)){
+            foreach($trx->produk as $produk){              
+                $stok=$produk->stok - $produk->pivot->jumlah;
+                $produk->update(['stok'=>$stok]);
+            }   
             $trx->update(['status'=>'selesai']);
             return response('ok');
         }else{
