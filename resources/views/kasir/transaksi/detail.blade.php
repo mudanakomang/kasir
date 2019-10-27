@@ -41,10 +41,9 @@
                                                 <div class="form-group row">
                                                     <h3 id="idtransaksi"></h3>
                                                 </div>
-
                                                 <div class="form-group row">
                                                     {!! Form::label('nopol','Nomor kendaraan',['class'=>'col-sm-3']) !!}
-                                                    {!! Form::select('nopol',[''=>'Cari Nomor Kendaraan']+\App\Kendaraan::whereDate('created_at', '=', date('Y-m-d'))->pluck('nopol', 'nopol')->all(),$data->nopol, ['class'=>'col-sm-4 form-control select2','id'=>'nopol'])!!}
+                                                    {!! Form::select('nopol',[''=>$data->nopol]+\App\Kendaraan::whereDate('created_at', '=', date('Y-m-d'))->pluck('nopol', 'nopol')->all(),$data->nopol, ['class'=>'col-sm-4 form-control select2','id'=>'nopol'])!!}
                                                 </div>
                                                 <div class="form-group row">
                                                     {!! Form::label('guide_id','Guide',['class'=>'col-sm-3']) !!}
