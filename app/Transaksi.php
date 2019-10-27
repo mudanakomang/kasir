@@ -8,7 +8,7 @@ class Transaksi extends Model
 {
     //
     protected $table ='transaksi';
-    protected $fillable=['kode','nopol','tipe_byr','total','jumlah_byr','status'];
+    protected $fillable=['kode','nopol','tipe_byr','total','jumlah_byr','status','user_id','print','finishtime'];
 
     public function produk(){
         return $this->belongsToMany(Produk::class)->withPivot(['jumlah','diskon']);

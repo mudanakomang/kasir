@@ -98,7 +98,7 @@ class PrintController extends Controller
         return $l.$m.$r."\n";
     }
     public function kasir($connector,$content,$total,$byr,$konter=false){    
-        $con=$connector = new WindowsPrintConnector($connector);
+        $con=$connector = new FilePrintConnector($connector);
         $printer = new Printer($con);
         // Header
         //$printer -> selectPrintMode(Printer::MODE_DOUBLE_HEIGHT);        

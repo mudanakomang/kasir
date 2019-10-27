@@ -25,7 +25,7 @@ class GuideController extends Controller
         $columnName = $request->columns[$columnIndex]['data'];
         $columnSortOrder = $request->order[0]['dir'];
         $total=Guide::count();
-        $guides=Guide::limit($length,$start)->orderBy($columnName,$columnSortOrder)->get();
+        $guides=Guide::offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
         $output=[];
         $output['draw']=$draw;
         $output['recordsTotal']=$total;
@@ -37,7 +37,7 @@ class GuideController extends Controller
                 ->orWhere('telp','LIKE',"%$search%")
                 ->orWhere('tgl_masuk','LIKE',"%$search%")
                 ->orWhere('honor','LIKE',"%$search%")
-                ->limit($length,$start)->orderBy($columnName,$columnSortOrder)->get();
+                ->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
             $output['recordsTotal']=$guides->count();
             $output['recordsFiltered']=$guides->count();
         }

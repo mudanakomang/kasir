@@ -201,7 +201,7 @@ class TransaksiController extends Controller
                 $stok=$produk->stok - $produk->pivot->jumlah;
                 $produk->update(['stok'=>$stok]);
             }   
-            $trx->update(['status'=>'selesai']);
+            $trx->update(['status'=>'selesai','user_id'=>Auth::user()->id,'finishtime'=>\Carbon\Carbon::now('Asia/Makassar')->format('Y-m-d H:i:s')]);
             return response('ok');
         }else{
             return response('no');

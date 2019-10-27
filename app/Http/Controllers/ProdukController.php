@@ -21,7 +21,7 @@ class ProdukController extends Controller
         $columnName = $request->columns[$columnIndex]['data'];
         $columnSortOrder = $request->order[0]['dir'];
         $total=Produk::with('kategori')->count();
-        $produk=Produk::with('kategori')->limit($length,$start)->orderBy($columnName,$columnSortOrder)->get();
+        $produk=Produk::with('kategori')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
         $output=[];
         $output['draw']=$draw;
         $output['recordsTotal']=$total;
@@ -37,7 +37,7 @@ class ProdukController extends Controller
                 ->orWhere('harga','LIKE',"%$search%")
                 ->orWhere('tipe_komisi','LIKE',"%$search%")
                 ->orWhere('komisi','LIKE',"%$search%")
-                ->limit($length,$start)->orderBy($columnName,$columnSortOrder)->get();
+                ->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
                 $output['recordsTotal']=$produk->count();
                 $output['recordsFiltered']=$produk->count();
         }

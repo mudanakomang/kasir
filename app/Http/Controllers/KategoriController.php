@@ -21,7 +21,7 @@ class KategoriController extends Controller
         $columnName = $request->columns[$columnIndex]['data'];
         $columnSortOrder = $request->order[0]['dir'];
         $total=Kategori::count();
-        $kategories=Kategori::limit($length,$start)->orderBy($columnName,$columnSortOrder)->get();
+        $kategories=Kategori::offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
         $output=[];
         $output['draw']=$draw;
         $output['recordsTotal']=$total;
@@ -32,7 +32,7 @@ class KategoriController extends Controller
             $kategories=Kategori::where('kode','LIKE',"%$search%")
                 ->orWhere('nama','LIKE',"%$search%")
                 ->orWhere('keterangan','LIKE',"%$search%")
-                ->limit($length,$start)->orderBy($columnName,$columnSortOrder)->get();
+                ->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
             $output['recordsTotal']=$kategories->count();
             $output['recordsFiltered']=$kategories->count();
         }

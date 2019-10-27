@@ -23,7 +23,7 @@ class KaryawanController extends Controller
         $columnSortOrder = $request->order[0]['dir'];
 
         $total=User::with('roles')->count();
-        $users=User::with('roles')->limit($length,$start)->orderBy($columnName,$columnSortOrder)->get();
+        $users=User::with('roles')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
         $output=[];
         $output['draw']=$draw;
         $output['recordsTotal']=$total;
@@ -34,7 +34,7 @@ class KaryawanController extends Controller
             $users=User::with(['roles'=>function($q) use ($search){
                  $q->where('name','LIKE',"%$search%");
             }])->where('username','LIKE',"%$search%")->orWhere('name','LIKE',"%$search%")
-                ->limit($length,$start)->orderBy($columnName,$columnSortOrder)->get();
+            ->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
             $output['recordsTotal']=$users->count();
             $output['recordsFiltered']=$users->count();
         }
