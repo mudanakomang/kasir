@@ -42,7 +42,7 @@
                                 <th>Tipe Pembayaran</th>
                                 <th>Total Belanja</th>
                                 <th>Jumlah Pembayaran</th>                                
-                              
+                                <th>Tanggal</th>
                                 </thead>
                             </table>
                         </div>
@@ -55,32 +55,36 @@
 @section('script')
 <script>
 function loadTransaksi(){
-        $('#transaksi').DataTable({
-            serverSide:true,
-            ordering:true,
-            processing:true,
-            ajax:{
-                url:'{{ route('listtransaksi') }}',
-                type:'POST',
-                data:{
+      var t=  $('#transaksi').DataTable({
+            "autoWidth": true,
+            "processing": true,
+            "serverSide": true,
+            "pageLength":10,
+            "ajax":{
+                "url":"{{ route('listtransaksi') }}",
+                "type":"POST",
+                "dataType": "json",
+                "data":{
                     _token:'{{ csrf_token() }}',
                     tipe:'{{ $tipe }}'
                 }
             },
-            columns:[
-                {data:'id'},
-                {data:'kode'},
-                {data:'nopol'},
-                {data:'guide'},
-                {data:'tipe_byr'},
-                {data:'total'},
-                {data:'jumlah_byr'},                
-            ],columnDefs:[{
-                    targets:[5,6],
-                    render: $.fn.dataTable.render.number( '.', ',', 0,'Rp. ' )
+            "columns":[
+                {"data":"id"},
+                {"data":"kode"},
+                {"data":"nopol"},
+                {"data":"guide"},
+                {"data":"tipe_byr"},
+                {"data":"total"},
+                {"data":"jumlah_byr"}, 
+                {"data":"tanggal"},               
+            ],"columnDefs":[{
+                    "targets":[5,6],
+                    "render": $.fn.dataTable.render.number( '.', ',', 0,'Rp. ' )
                 },{
-                    targets:1,
-                    render:function(data,type,row){
+                    "targets":1,
+                    "orderable": false,
+                    "render":function(data,type,row){
                         return "<a href='{{ url('transaksi/detail')}}/"+data+"'>"+data+"</a>"
                     }
                 }

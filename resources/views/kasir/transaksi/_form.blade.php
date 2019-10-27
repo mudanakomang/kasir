@@ -354,7 +354,7 @@
                         },{
                             targets:2,
                             render:function (data) {                              
-                                return "<input type=number name=jumlah style=width:45px id="+data.id+" value="+data.pivot.jumlah+" autocomplete='off' onchange='updateJumlah(this.id,this.value)' oninput='this.onchange()'   >"
+                                return "<input type=number name=jumlah style=width:45px id="+data.id+" value="+data.pivot.jumlah+" autocomplete='off' onchange='updateJumlah(this.id,this.value)' oninput='this.onchange()'  min=0 >"
                             }
                         },{
                             targets:[4,6],
@@ -362,7 +362,7 @@
                         },{
                             targets:5,
                             render:function(data){                             
-                                return "<input type=number name=diskon style=width:45px step=5 id="+data.id+" value="+data.pivot.diskon+" autocomplete='off' onchange='updateDiskon(this.id,this.value)' oninput='this.onchange()'   > %"
+                                return "<input type=number name=diskon style=width:45px step=5 id="+data.id+" value="+data.pivot.diskon+" autocomplete='off' onchange='updateDiskon(this.id,this.value)' oninput='this.onchange()' min=0 > %"
                             }
                         },{
                                 targets:7,

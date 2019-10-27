@@ -72,24 +72,24 @@ class PrintController extends Controller
     // }
 
     public function line($str){    
-        return str_pad("",34,$str)."\n";
+        return str_pad("",40,$str)."\n";
       
     }
     public function rows($left='',$mid='',$right='',$alignright=false){
       
         if($alignright){
             if($left===''){
-                $l=str_pad($left,5);     
+                $l=str_pad($left,11);     
             }  else{
-                $l=str_pad($left,14); 
+                $l=str_pad($left,20); 
             }     
             $m=str_pad($mid,15," ",STR_PAD_LEFT);
             $r=str_pad($right,14," ",STR_PAD_LEFT);
         }else{   
             if($left===''){
-                $l=str_pad($left,14);     
+                $l=str_pad($left,20);     
             }  else{
-                $l=str_pad($left,19); 
+                $l=str_pad($left,25); 
             }   
             
             $m=str_pad($mid,5);
@@ -98,14 +98,16 @@ class PrintController extends Controller
         return $l.$m.$r."\n";
     }
     public function kasir($connector,$content,$total,$byr,$konter=false){    
-        $con=$connector = new FilePrintConnector($connector);
+        $con=$connector = new WindowsPrintConnector($connector);
         $printer = new Printer($con);
         // Header
-       // $printer -> selectPrintMode(Printer::MODE_DOUBLE_HEIGHT);
-        $printer -> text("INTAN SARI LUWAK COFFEE \n");
-        $printer -> text("GARDEN & BALI SWING \n");
-        //$printer -> selectPrintMode();
-       // $printer -> setJustification(Printer::JUSTIFY_LEFT);
+        //$printer -> selectPrintMode(Printer::MODE_DOUBLE_HEIGHT);        
+        $printer -> setJustification(Printer::JUSTIFY_CENTER); 
+        $printer -> text("INTAN SARI LUWAK COFFEE GARDEN \n& BALI SWING\n");        
+       // $printer -> text("GARDEN & BALI SWING \n");
+       // $printer -> selectPrintMode();
+        $printer -> feed();
+        $printer -> setJustification(Printer::JUSTIFY_LEFT);
         $printer -> text("Jl. RAYA TAMPAK SIRING\n");
         $printer -> text("GIANYAR BALI\n");
         $printer -> text("Telp/WA 08164701597/081246109766\n");
@@ -116,7 +118,11 @@ class PrintController extends Controller
         //$printer -> setJustification(Printer::JUSTIFY_CENTER);      
        // $printer -> setEmphasis(true);
         $printer -> text($this->rows($content->kode,"",""));
-        $printer -> text($this->rows($content->nopol,$content->guide->name,""));
+        if(!$konter){
+            $printer -> text($this->rows($content->nopol,"",""));
+        }else{
+            $printer -> text($this->rows($content->nopol,"",$content->guide->name));
+        }
        // $printer -> setEmphasis(false);
         // item
       //  $printer -> setJustification(Printer::JUSTIFY_LEFT);
@@ -124,26 +130,35 @@ class PrintController extends Controller
         $printer->text($this->line('='));
         $printer->text($this->rows('Item','Qty','Subtotal'));
         $printer->text($this->line('='));  
-        $totalkomisi=0;
-        foreach($content->produk as $produk){
+        $tkomisi=0;
+        foreach($content->produk as $produk){    
+            $totalkomisi=0;          
             if($konter){             
                 $printer->text($this->rows($produk->nama," X".$produk->pivot->jumlah,number_format($produk->subtotal,0,"",".")));
+               
                 if($produk->pivot->diskon>0){
                     $harga=$produk->harga;
-                    $harga_after_diskon=$harga-($harga*$produk->pivot->diskon/100);
-                    $totalh=$harga_after_diskon*$produk->pivot->jumlah;
+                    $kms=$produk->komisi;                    
+                    $harga_after_diskon=$harga-($harga*$produk->pivot->diskon/100);                                 
+                    //$totalh=$harga_after_diskon*$produk->pivot->jumlah;
+                    
                     if($produk->tipe_komisi==='fix'){
-                        $komisi=($produk->komisi*$produk->pivot->jumlah)-$totalh;
-                        $totalkomisi+=$komisi;
+                        $persen=$kms/$harga;
+                        $komisi=($harga_after_diskon-($harga_after_diskon*$persen)*$produk->pivot->jumlah);
+                        //$komisi=($produk->komisi*$produk->pivot->jumlah)-$totalh;
+                        $totalkomisi+=$komisi;                       
                     }else{
-                        $awal=$harga*$produk->pivot->jumlah-(($harga*$produk->komisi/100)*$produk->pivot->jumlah);
-                        $komisi=$totalh-$awal;
-                        $totalkomisi+=$komisi;
-                    }
+                        //$awal=$harga*$produk->pivot->jumlah-(($harga*$produk->komisi/100)*$produk->pivot->jumlah);
+                        //$komisi=$totalh-$awal;
+                        $komisi=$produk->pivot->jumlah*($harga_after_diskon-($harga_after_diskon*$kms/100));                                       
+                        $totalkomisi+=$komisi;                        
+                    }      
+                    $tkomisi+=$totalkomisi;           
                     $harga=number_format(($produk->harga*$produk->pivot->jumlah)-($produk->pivot->jumlah*($produk->harga-($produk->harga*$produk->pivot->diskon/100))),0,"",".");               
                     $printer->text($this->rows('','Disc ('.$produk->pivot->diskon.'%)',"-".$harga));
-                    $printer->text($this->rows('','Komisi :', "Rp ".number_format($komisi,0,"","."),true));
+                    $printer->text($this->rows('','Komisi :', "Rp ".number_format($totalkomisi,0,"","."),true));
                 }else{
+                    
                     if($produk->tipe_komisi==='fix'){
                         $komisi=$produk->komisi*$produk->pivot->jumlah;   
                         $totalkomisi+=$komisi;                 
@@ -151,7 +166,8 @@ class PrintController extends Controller
                         $komisi=($produk->harga*$produk->komisi/100)*$produk->pivot->jumlah;
                         $totalkomisi+=$komisi;
                     }
-                    $printer->text($this->rows('','Komisi :', "Rp ".number_format($komisi,0,"","."),true));
+                    $tkomisi+=$totalkomisi;
+                    $printer->text($this->rows('','Komisi :', "Rp ".number_format($totalkomisi,0,"","."),true));
                 } 
             }else{
             $printer->text($this->rows($produk->nama," X".$produk->pivot->jumlah,number_format($produk->subtotal,0,"",".")));
@@ -162,7 +178,7 @@ class PrintController extends Controller
              }
             $printer->text($this->line('-'));  
         }        
-
+        $printer->feed();
        // $printer -> selectPrintMode(Printer::MODE_DOUBLE_WIDTH);
        if($konter){         
         $printer -> text($this->rows('','Total Belanja:', "Rp ".number_format($total,0,"","."),true));
@@ -171,7 +187,7 @@ class PrintController extends Controller
         //$printer -> setEmphasis(true);       
         //$printer -> setEmphasis(false);
        // $printer -> setEmphasis(true);
-        $printer -> text($this->rows('','Total Komisi:', "Rp ".number_format($totalkomisi,0,"","."),true));
+        $printer -> text($this->rows('','Total Komisi:', "Rp ".number_format($tkomisi,0,"","."),true));
        }else{        
         $printer -> text($this->rows('','Total :', "Rp ".number_format($total,0,"","."),true));
         //$printer -> selectPrintMode();
@@ -187,12 +203,14 @@ class PrintController extends Controller
         //$printer -> feed(2);
        // $printer -> setJustification(Printer::JUSTIFY_CENTER);
        $printer->text($this->line('='));  
-       if(!$konter){ 
-        $printer -> text("Items that have been purchased\ncannot be returned unless there is\nan agreement\n");
+       $printer->feed();
+       if(!$konter){         
+             $printer -> text("Items that have been purchased cannot be\nreturned unless there is an agreement\n");
         }
-       // $printer -> feed(2);
+        $printer -> feed(2);
         $printer -> text(\Carbon\Carbon::now('Asia/Makassar')->format('d/m/Y H:i') . " by ".\Illuminate\Support\Facades\Auth::user()->name."\n");
         /* Cut the receipt and open the cash drawer */
+        $printer->feed();
         $printer -> cut();
         $printer -> pulse();
         $printer -> close();
@@ -213,8 +231,8 @@ class PrintController extends Controller
        }   
         
        Transaksi::where('kode','=',$request->kode)->update(['total'=>$request->total,'jumlah_byr'=>$request->byr,'tipe_byr'=>$request->tipe,'print'=>'1']);
-       $this->kasir('epson tm u220',$trx,$request->total,$request->byr);
-       $this->kasir('epson tm u2202',$trx,$request->total,$request->byr,true);
+       $this->kasir('EPSON TM-U220',$trx,$request->total,$request->byr);
+       $this->kasir('EPSON TM-U220',$trx,$request->total,$request->byr,true);
         // $html=view('kasir.transaksi.print',['data'=>$trx,'total'=>$totalbelanja,'byr'=>$byr,'tipe'=>$tipe])->render();
         // file_put_contents('testfile', $html);
         // return $html;
