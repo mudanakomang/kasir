@@ -15,8 +15,10 @@
     <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
     <!--Datatable -->
     <link rel="stylesheet" href="{{ asset('plugins/datatables-bs4/css/dataTables.bootstrap4.css')}}">
+    <link rel="stylesheet" href="{{ asset('plugins/datatables/buttons.dataTables.min.css') }}">
     <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css')}}">
     <link rel="stylesheet" href="{{ asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
+    <link rel="stylesheet" href="{{ asset('css/daterangepicker.css')}}">
     <link rel="stylesheet" href="{{ asset('plugins/bootstrap/css/bootstrap-datetimepicker.min.css')}}">
     <!-- Google Font: Source Sans Pro -->
     <link href="{{ asset('css/google.css') }}" rel="stylesheet">
@@ -239,7 +241,15 @@
 <script src="{{ asset('plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
 <!-- DataTables -->
 <script src="{{ asset('plugins/datatables/jquery.dataTables.js') }}"></script>
+
 <script src="{{ asset('plugins/datatables-bs4/js/dataTables.bootstrap4.js') }}"></script>
+<script src="{{ asset('plugins/datatables/dataTables.buttons.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/buttons.flash.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/jszip.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/pdfmake.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/vfs_fonts.js') }}"></script>
+<script src="{{ asset('plugins/datatables/buttons.html5.min.js') }}"></script>
+<script src="{{ asset('plugins/datatables/buttons.print.min.js') }}"></script>
 <!-- AdminLTE App -->
 <script src="{{ asset('dist/js/adminlte.js') }}"></script>
 
@@ -256,6 +266,7 @@
 <script src="{{ asset('plugins/chart.js/Chart.min.js') }}"></script>
 <script src="{{ asset('plugins/sweetalert2/sweetalert2.all.min.js') }}"></script>
 <script src="{{ asset('plugins/moment/moment-with-locales.min.js') }}"></script>
+<script src="{{ asset('js/daterangepicker.js') }}"></script>
 <script src="{{ asset('plugins/bootstrap/js/bootstrap-datetimepicker.min.js') }}"></script>
 <script src="{{ asset('js/js.cookie.min.js') }}"></script>
 <script src="{{ asset('js/jquery.number.min.js') }}"></script>

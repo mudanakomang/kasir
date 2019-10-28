@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Produk;
+use App\Transaksi;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -11,6 +12,57 @@ class ProdukController extends Controller
     //
     public function index(){
         return view('admin.produk.index');
+    }
+    public function terjual(){
+        return view('admin.produk.terjual');
+    }
+    public function produkterjual(Request $request){
+        $draw=$request->draw;
+        $length=$request->length;
+        $start=$request->start;
+        $search=$request->search['value'];
+        $columnIndex = $request->order[0]['column'];
+        $columnName = $request->columns[$columnIndex]['data'];
+        $columnSortOrder = $request->order[0]['dir'];
+        
+        $total=Produk::with('transaksi')->count();      
+        $produk=Produk::with('transaksi')->with('kategori')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
+        $output['draw']=$draw;
+        $output['recordsTotal']=$total;
+        $output['recordsFiltered']=$total;
+        $output['data']=[];  
+      
+        if (!empty($search)){
+            $produk=Produk::with('kategori')->whereHas('transaksi')
+                ->where('kode','LIKE',"%$search%")
+               ->orWhere('nama','LIKE',"%$search%")
+               ->orWhere('stok','LIKE',"%$search%")
+               ->orWhere('satuan','LIKE',"%$search%")
+               ->orWhere('harga','LIKE',"%$search%")
+               ->orWhere('tipe_komisi','LIKE',"%$search%")
+               ->orWhere('komisi','LIKE',"%$search%")->orWhereHas('transaksi',function($q) use ($search){
+                   return $q->where('kode','LIKE',"%$search%")->orWhere('nopol','LIKE',"%$search%");
+               })->with('transaksi')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
+               $output['recordsTotal']=$produk->count();
+               $output['recordsFiltered']=$produk->count();
+       }  
+       foreach ($produk as $k=>$prd){
+            foreach($prd->transaksi as $key=>$trx){
+                $subdata['id']=$key+1;
+                $subdata['produkid']=$prd->id;
+                $subdata['kode']=$prd->kode;
+                $subdata['trx']=$trx->kode;
+                $subdata['nama']=$prd->nama;
+                $subdata['kategori_id']=$prd->kategori->nama;
+                $subdata['jumlah']=$trx->pivot->jumlah;
+                $subdata['satuan']=$prd->satuan;
+                $subdata['harga']=$prd->harga;
+                $subdata['tipe_komisi']=$prd->tipe_komisi;
+                $subdata['komisi']=$prd->komisi;
+                $output['data'][]=$subdata;
+            }
+        }
+    return response(json_encode($output)); 
     }
     public function listproduk(Request $request){
         $draw=$request->draw;

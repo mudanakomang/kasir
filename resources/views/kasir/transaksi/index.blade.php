@@ -33,6 +33,15 @@
                         </div>
 
                         <div class="card-body">
+                        <div class="form-group col-3">
+                            <label>Filter Tanggal</label>
+
+                            <div class="input-group">                           
+                            <input type="text" autocomplete="off" class="form-control pull-right" id="filtertgl">
+                            </div>
+                            <!-- /.input group -->
+                        </div>                       
+                        
                             <table id="transaksi" class="table table-hover responsive table-striped dataTable">
                                 <thead>
                                 <th>No</th>
@@ -43,6 +52,7 @@
                                 <th>Total Belanja</th>
                                 <th>Jumlah Pembayaran</th>                                
                                 <th>Tanggal</th>
+                                <th>Kasir</th>
                                 </thead>
                             </table>
                         </div>
@@ -54,19 +64,28 @@
 @endsection
 @section('script')
 <script>
-function loadTransaksi(){
+function loadTransaksi(startdate='',enddate=''){
       var t=  $('#transaksi').DataTable({
+            "dom": 'lBfrtip',
+            "buttons": [
+                'excel', 'pdf','csv','copy'
+            ],
             "autoWidth": true,
             "processing": true,
             "serverSide": true,
             "pageLength":10,
+            "lengthMenu": [
+                [ 10, 25, 50, -1 ],
+                [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+            ],
             "ajax":{
                 "url":"{{ route('listtransaksi') }}",
                 "type":"POST",
                 "dataType": "json",
                 "data":{
                     _token:'{{ csrf_token() }}',
-                    tipe:'{{ $tipe }}'
+                    tipe:'{{ $tipe }}',
+                    startdate:startdate,enddate:enddate,
                 }
             },
             "columns":[
@@ -77,7 +96,8 @@ function loadTransaksi(){
                 {"data":"tipe_byr"},
                 {"data":"total"},
                 {"data":"jumlah_byr"}, 
-                {"data":"tanggal"},               
+                {"data":"tanggal"},    
+                {"data":"kasir"},           
             ],"columnDefs":[{
                     "targets":[5,6],
                     "render": $.fn.dataTable.render.number( '.', ',', 0,'Rp. ' )
@@ -95,6 +115,26 @@ function loadTransaksi(){
 
     }
     $(document).ready(function(){
+        $('#filtertgl').daterangepicker({
+            autoUpdateInput: false,
+            opens:'right',
+             locale: {
+                cancelLabel: 'Clear'
+            }
+        })
+        $('#filtertgl').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        });
+
+        $('#filtertgl').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
+        $('#filtertgl').on('apply.daterangepicker', function(ev, picker) {
+            $('#transaksi').DataTable().destroy();
+           var startdate=picker.startDate.format('YYYY-MM-DD');
+           var enddate=picker.endDate.format('YYYY-MM-DD');
+            loadTransaksi(startdate,enddate)
+        });
         loadTransaksi()
     })
 </script>

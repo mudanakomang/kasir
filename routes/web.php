@@ -75,6 +75,8 @@ Route::group(['prefix'=>'admin','middleware'=>['auth']],function(){
     Route::post('produk/kategori/update/{id}','KategoriController@update')->name('updatekategori');
 
     Route::get('produk','ProdukController@index')->name('produk');
+    Route::get('produk/terjual','ProdukController@terjual')->name('terjual');
+    Route::post('produkterjual','ProdukController@produkterjual')->name('produkterjual');  
     Route::post('produk/list','ProdukController@listproduk')->name('listproduk');
     Route::post('produk/delete','ProdukController@delete')->name('deleteproduk');
     Route::get('produk/add','ProdukController@add')->name('addproduk');

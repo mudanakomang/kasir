@@ -14,7 +14,7 @@ class Transaksi extends Model
         return $this->belongsToMany(Produk::class)->withPivot(['jumlah','diskon']);
     }
     public function user(){
-        return $this->belongsToMany(User::class);
+        return $this->belongsTo('App\User','user_id','id');
     }
     public function guide(){
         return $this->belongsTo(Guide::class);

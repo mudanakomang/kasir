@@ -33,29 +33,39 @@ class TransaksiController extends Controller
             6=>'total',
             7=>'jumlah_byr',
             8=>'tanggal',
+            9=>'kasir',
         ];
         $totalData = $total->count();
         $totalFiltered = $totalData;
-
-        $limit = $request->input('length');
-        $start = $request->input('start');
+        
+        $request->length> 0 ? $limit=$request->length:$limit=$total->count();
+        $request->length> 0 ? $start = $request->input('start'):$start=0;
         $order = $columns[$request->input('order.0.column')];
         $dir = $request->input('order.0.dir');
         $search=$request->input('search.value');
 
         if (!empty($search)){
-             $trx=Transaksi::with('produk')
-                 ->where('kode','LIKE',"%$search%")
+             $trx=Transaksi::with('produk')->where('kode','LIKE',"%$search%")
                 ->orWhere('nopol','LIKE',"%$search%")
                 ->orWhere('tipe_byr','LIKE',"%$search%")
                 ->orWhere('total','LIKE',"%$search%") 
-                ->orWhere('jumlah_byr','LIKE',"%$search%")              
-                ->offset($start)->limit($limit)->with('guide')->where('status','=',$request->tipe)->orderBy($order,$dir)->get();
+                ->orWhere('jumlah_byr','LIKE',"%$search%")->orWhereHas('user',function($q) use($search){
+                    return $q->where('name','LIKE',"%$search%")->orWhere('username','LIKE',"%$search%");
+                })->when(($request->startdate!='' && $request->enddate !=''),function($q) use ($request){
+                    return $q->whereDate('finishtime','<=',$request->enddate)
+                             ->whereDate('finishtime','>=',$request->startdate);
+                })            
+                ->offset($start)->limit($limit)->with('guide')->with('user')->where('status','=',$request->tipe)->orderBy($order,$dir)->get();
                // $output['recordsTotal']=$trx->count();
                 //$output['recordsFiltered']=$trx->count();
                 $totalFiltered=count($trx);
-        }else{
-            $trx=Transaksi::with('produk')->with('guide')->offset($start)->limit($limit)->where('status','=',$request->tipe)->orderBy($order,$dir)->get();
+               
+        }else{          
+            $trx=Transaksi::with('produk')->with('guide')->with('user')->when($request->startdate!='' && $request->enddate !='',function($q) use ($request){
+                return $q->whereDate('finishtime','<=',$request->enddate)
+                         ->whereDate('finishtime','>=',$request->startdate);
+            })->offset($start)->limit($limit)->where('status','=',$request->tipe)->orderBy($order,$dir)->get();
+          
         }
         $data=[];
         if(!empty($trx)){
@@ -68,7 +78,8 @@ class TransaksiController extends Controller
                 $subdata['tipe_byr']=$prd->tipe_byr;
                 $subdata['total']=$prd->total;
                 $subdata['jumlah_byr']=$prd->jumlah_byr;
-                $subdata['tanggal']=\Carbon\Carbon::parse($prd->created_at)->format('Y/m/d H:i');           
+                $subdata['tanggal']=\Carbon\Carbon::parse($prd->created_at)->format('Y/m/d H:i');   
+                $subdata['kasir']=$prd->user->name;        
                 $data[]=$subdata;
             }
             $json_array=[

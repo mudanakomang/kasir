@@ -83,6 +83,12 @@
                         <p>Produk</p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{ url('admin/produk/terjual') }}" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Produk Terjual</p>
+                    </a>
+                </li>
             </ul>
         </li>
         <li class="nav-item ">
