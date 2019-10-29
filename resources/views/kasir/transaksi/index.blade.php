@@ -67,8 +67,17 @@
 function loadTransaksi(startdate='',enddate=''){
       var t=  $('#transaksi').DataTable({
             "dom": 'lBfrtip',
-            "buttons": [
-                'excel', 'pdf','csv','copy'
+            "buttons": [{
+                extend:'excel',
+                title:'Transaksi-'+ moment().format('YYYYMMDD')        
+            },{
+                extend:'pdf',
+                title:'Transaksi-'+ moment().format('YYYYMMDD')        
+            },{
+                extend:'csv',
+                title:'Transaksi-'+ moment().format('YYYYMMDD')        
+            }
+               // , 'pdf','csv','copy'
             ],
             "autoWidth": true,
             "processing": true,
@@ -77,7 +86,8 @@ function loadTransaksi(startdate='',enddate=''){
             "lengthMenu": [
                 [ 10, 25, 50, -1 ],
                 [ '10 rows', '25 rows', '50 rows', 'Show all' ]
-            ],
+            ], scrollY: 370,
+           
             "ajax":{
                 "url":"{{ route('listtransaksi') }}",
                 "type":"POST",
@@ -135,7 +145,7 @@ function loadTransaksi(startdate='',enddate=''){
            var enddate=picker.endDate.format('YYYY-MM-DD');
             loadTransaksi(startdate,enddate)
         });
-        loadTransaksi()
+        loadTransaksi('{{$startdate}}','{{$enddate}}')
     })
 </script>
 @endsection

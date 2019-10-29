@@ -18,12 +18,16 @@ Route::get('/', function () {
 
 Auth::routes(['register'=>false]);
 Route::group(['middleware'=>['auth']],function (){
+    Route::get('password/reset',function(){       
+        return view('admin.karyawan.reset');
+    });
+    Route::post('resetpass','KaryawanController@resetpass')->name('resetpass');
     Route::get('kendaraan','KendaraanController@index')->name('kendaraan');
     Route::post('listnopol','KendaraanController@listnopol')->name('listnopol');
     Route::post('savenopol','KendaraanController@savenopol')->name('savenopol');
     Route::post('deletenopol','KendaraanController@deletenopol')->name('deletenopol');
 
-    Route::get('transaksi/t/{tipe}','TransaksiController@index')->name('transaksi');
+    Route::get('transaksi/t/{tipe}/{start?}/{end?}','TransaksiController@index')->name('transaksi');
     Route::get('transaksi/detail/{kode}','TransaksiController@detail')->name('detail');
     Route::post('listtransaksi','TransaksiController@listtransaksi')->name('listtransaksi');
     Route::get('transaksi/add','TransaksiController@add')->name('addtransaksi');
@@ -47,7 +51,14 @@ Route::group(['middleware'=>['auth']],function (){
 });
 Route::group(['prefix'=>'admin','middleware'=>['auth']],function(){
     Route::get('/', function(){
-        return view('home');
+        $todaytrx=\App\Transaksi::whereDay('finishtime',date('d'))->count();
+        $monthtrx=\App\Transaksi::whereMonth('finishtime',date('m'))->count();
+        $trxtertinggi=\App\Transaksi::orderBy('total','desc')->first();
+        $pending=\App\Transaksi::where('status','=','pending')->count();
+        $hbs=\App\Produk::where('stok','<',10)->get();
+        $total=\App\Kendaraan::count();
+        $last=\App\Kendaraan::orderBy('created_at','desc')->first();
+        return view('home',['todaytrx'=>$todaytrx,'monthtrx'=>$monthtrx,'maxtrx'=>$trxtertinggi,'pending'=>$pending,'hbs'=>$hbs,'total'=>$total,'last'=>$last]);
     })->name('admin');
     Route::get('karyawan','KaryawanController@index')->name('karyawan');
     Route::post('karyawan/list','KaryawanController@listkaryawan')->name('listkaryawan');
@@ -88,12 +99,22 @@ Route::group(['prefix'=>'admin','middleware'=>['auth']],function(){
 });
 Route::group(['prefix'=>'kasir','middleware'=>['auth']],function(){
     Route::get('/', function(){
-        return view('home');
+        $todaytrx=\App\Transaksi::whereDay('finishtime',date('d'))->count();
+        $monthtrx=\App\Transaksi::whereMonth('finishtime',date('m'))->count();
+        $trxtertinggi=\App\Transaksi::orderBy('total','desc')->first();
+        $pending=\App\Transaksi::where('status','=','pending')->count();
+        $hbs=\App\Produk::where('stok','<',10)->get();
+        $total=\App\Kendaraan::count();
+        $last=\App\Kendaraan::orderBy('created_at','desc')->first();
+        
+        return view('home',['todaytrx'=>$todaytrx,'monthtrx'=>$monthtrx,'maxtrx'=>$trxtertinggi,'pending'=>$pending,'hbs'=>$hbs,'total'=>$total,'last'=>$last]);
     })->name('kasir');
 });
 Route::group(['prefix'=>'konter','middleware'=>['auth']],function(){
     Route::get('/', function(){
-        return view('home');
+        $total=\App\Kendaraan::count();
+        $last=\App\Kendaraan::orderBy('created_at','desc')->first();
+        return view('home',['total'=>$total,'last'=>$last]);
     })->name('konter');
 
 

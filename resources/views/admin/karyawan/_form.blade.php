@@ -51,6 +51,26 @@
         @endif
     </div>
     @endif
+    @if($action==='edit')
+    <div class="form-group row">
+        {!! Form::label('password','Password',['class'=>'col-sm-4 col-form-label']) !!}
+        {!! Form::password('password', ['class'=>$errors->has('password') ? 'col-sm-6 form-control is-invalid':'col-sm-6 form-control', 'placeholder'=>'Password'])!!}
+        @if ($errors->has('password'))
+            <span class="text-danger offset-4 col-sm-10">
+                  <p>{{ $errors->first('password') }}</p>
+              </span>
+        @endif
+    </div>
+    <div class="form-group row">
+        {!! Form::label('password_confirmation','Konfirmasi Password',['class'=>'col-sm-4 col-form-label']) !!}
+        {!! Form::password('password_confirmation', ['class'=>$errors->has('password_confirmation') ? 'col-sm-6 form-control is-invalid':'col-sm-6 form-control', 'placeholder'=>'Konfirmasi Password'])!!}
+        @if ($errors->has('password_confirmation'))
+            <span class="text-danger offset-4 col-sm-10">
+                  <p>{{ $errors->first('password_confirmation') }}</p>
+              </span>
+        @endif
+    </div>
+    @endif
     <div class="card-footer">
         <button type="submit" class="btn btn-info">Simpan</button>
     </div>

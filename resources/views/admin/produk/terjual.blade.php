@@ -32,6 +32,14 @@
                             </div> -->
                         </div>
                         <div class="card-body">
+                        <div class="form-group col-3">
+                            <label>Filter Tanggal</label>
+
+                            <div class="input-group">                           
+                            <input type="text" autocomplete="off" class="form-control pull-right" id="filtertgl">
+                            </div>
+                            <!-- /.input group -->
+                        </div> 
                             <table id="produk" class="table table-hover table-striped dataTable">
                                 <thead>
                                 <th>No</th>
@@ -55,18 +63,35 @@
 @endsection
 @section('script')
     <script>
-        function loadProduk() {
-            $('#produk').DataTable({
+        function loadProduk(startdate='',enddate='') {
+            var t=$('#produk').DataTable({
+                dom:'lBfrtip',
+                buttons:[{
+                    extend:'excel',
+                    title:'Produk Terjual '+moment().format('YYYYMMDD')
+                },{
+                    extend:'pdf',
+                    title:'Produk Terjual '+moment().format('YYYYMMDD')
+                },{
+                    extend:'csv',
+                    title:'Produk Terjual '+moment().format('YYYYMMDD')
+                }],
                 serverSide:true,
                 ordering:true,
                 processing:true,
                 pageLength:10,
                 info:false,
+                lengthMenu:[
+                    [10,25,50,-1],
+                    [ '10 rows', '25 rows', '50 rows', 'Show all' ]
+                ],
+                scrollY:350,
                 ajax:{
                     url:'{{ route('produkterjual') }}',
                     type:'POST',
                     data:{
                         _token:'{{ csrf_token() }}',
+                        startdate:startdate,enddate:enddate
                     }
                 },
                 columns:[
@@ -88,6 +113,12 @@
                     "targets": 0,
                     render:function(data,type,row,m) {
                         return m.row+1
+                    }
+                },{                    
+                    "targets":3,
+                    "orderable": false,
+                    "render":function(data,type,row){
+                        return "<a href='{{ url('transaksi/detail')}}/"+data+"'>"+data+"</a>"
                     }
                 },{
                     targets:7,
@@ -111,7 +142,27 @@
             })
         }
         $(document).ready(function () {
-            loadProduk()
+            $('#filtertgl').daterangepicker({
+            autoUpdateInput: false,
+            opens:'right',
+             locale: {
+                cancelLabel: 'Clear'
+            }
+        })
+        $('#filtertgl').on('apply.daterangepicker', function(ev, picker) {
+            $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        });
+
+        $('#filtertgl').on('cancel.daterangepicker', function(ev, picker) {
+            $(this).val('');
+        });
+        $('#filtertgl').on('apply.daterangepicker', function(ev, picker) {
+            $('#produk').DataTable().destroy();
+           var startdate=picker.startDate.format('YYYY-MM-DD');
+           var enddate=picker.endDate.format('YYYY-MM-DD');
+           loadProduk(startdate,enddate)
+        });
+           loadProduk()
         })
 
     </script>

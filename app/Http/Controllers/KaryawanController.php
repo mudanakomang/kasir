@@ -6,12 +6,35 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Validator;
+use Illuminate\Support\Facades\Auth;
 
 class KaryawanController extends Controller
 {
     //
     public function index(){
         return view('admin.karyawan.index');
+    }
+    public function resetpass(Request $request){
+        $rules=[
+           
+            'password'=>'required|confirmed|min:6'
+          ];
+          $messages=[            
+              'password.confirmed'=>'Konfirmasi password tidak sesuai',
+              'password.min'=>'Password minimal 6 karakter',
+              'password.required'=>'Password harus diisi',
+          ];
+          $validator=Validator::make($request->all(),$rules,$messages);
+          if($validator->fails()){
+              return redirect()->back()->withErrors($validator)->withInput();
+          }else
+          {
+              $karyawan=User::find(Auth::user()->id);
+              $karyawan->update(['password'=>bcrypt($request->password)]);            
+              Auth::logout();
+              Session::flush();
+              return redirect('/');
+          }
     }
     public function listkaryawan(Request $request){
         $draw=$request->draw;
@@ -64,27 +87,56 @@ class KaryawanController extends Controller
         return view('admin.karyawan.manage',['data'=>$karyawan,'action'=>'edit']);
     }
     public function update(Request $request){
-        $rules=[
-          'name'=>'required',
-          'username'=>'required|min:6',
-          'role'=>'required'
-        ];
-        $messages=[
-            'name.required'=>'Nama harus diisi',
-            'username.required'=>'Nama Pengguna harus diisi',
-            'username.min'=>'Nama pengguna minimal karakter 6',
-            'role.required'=>'Role harus diisi',
-        ];
-        $validator=Validator::make($request->all(),$rules,$messages);
-        if($validator->fails()){
-            return redirect()->back()->withErrors($validator)->withInput();
-        }else
-        {
-            $karyawan=User::find($request->id);
-            $karyawan->update($request->all());
-            $karyawan->roles()->sync($request->role);
-            return redirect(route('karyawan'));
+        if(empty($request->password)){
+            $rules=[
+                'name'=>'required',
+                'username'=>'required|min:6',
+                'role'=>'required'
+              ];
+              $messages=[
+                  'name.required'=>'Nama harus diisi',
+                  'username.required'=>'Nama Pengguna harus diisi',
+                  'username.min'=>'Nama pengguna minimal karakter 6',
+                  'role.required'=>'Role harus diisi',
+              ];
+              $validator=Validator::make($request->all(),$rules,$messages);
+              if($validator->fails()){
+                  return redirect()->back()->withErrors($validator)->withInput();
+              }else
+              {
+                  $karyawan=User::find($request->id);
+                  $karyawan->update(['name'=>$request->name,'username'=>$request->username]);
+                  $karyawan->roles()->sync($request->role);
+                  return redirect(route('karyawan'));
+              }
+        }else{
+            $rules=[
+                'name'=>'required',
+                'username'=>'required|min:6',
+                'role'=>'required',
+                'password'=>'confirmed|min:6'
+              ];
+              $messages=[
+                  'name.required'=>'Nama harus diisi',
+                  'username.required'=>'Nama Pengguna harus diisi',
+                  'username.min'=>'Nama pengguna minimal karakter 6',
+                  'role.required'=>'Role harus diisi',
+                  'password.confirmed'=>'Konfirmasi password tidak sesuai',
+                  'password.min'=>'Password minimal 6 karakter',
+              ];
+              $validator=Validator::make($request->all(),$rules,$messages);
+              if($validator->fails()){
+                  return redirect()->back()->withErrors($validator)->withInput();
+              }else
+              {
+                  $karyawan=User::find($request->id);
+                  $karyawan->update(['name'=>$request->name,'username'=>$request->username,'password'=>bcrypt($request->password)]);
+                  $karyawan->roles()->sync($request->role);
+                  return redirect(route('karyawan'));
+              }
         }
+       
+       
     }
     public function store(Request $request){
         $rules=[
@@ -103,6 +155,7 @@ class KaryawanController extends Controller
             'password.confirmed'=>'Konfirmasi password tidak sesuai',
             'password.required'=>'Password harus diisi'
         ];
+        
         $validator =Validator::make($request->all(),$rules,$messages);
         if ($validator->fails()){
             return redirect()->back()->withErrors($validator)->withInput();

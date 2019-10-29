@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class TransaksiController extends Controller
 {
     //
-    public function index($tipe){            
-        return view('kasir.transaksi.index',['tipe'=>$tipe]);
+    public function index($tipe,$startdate=null,$enddate=null){            
+        return view('kasir.transaksi.index',['tipe'=>$tipe,'startdate'=>$startdate,'enddate'=>$enddate]);
     }
     public function detail($kode){
         $data=Transaksi::where('kode','=',$kode)->with(['produk'=>function($q){
@@ -194,7 +194,7 @@ class TransaksiController extends Controller
     }
 
     public function pendingtrx(Request $request){
-        Transaksi::where('kode','=',$request->kode)->update(['status'=>'pending']);
+        Transaksi::where('kode','=',$request->kode)->update(['status'=>'pending','user_id'=>Auth::user()->id]);
         return response('ok');
     }
     public function canceltrx(Request $request){

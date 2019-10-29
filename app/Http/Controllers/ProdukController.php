@@ -18,20 +18,26 @@ class ProdukController extends Controller
     }
     public function produkterjual(Request $request){
         $draw=$request->draw;
-        $length=$request->length;
-        $start=$request->start;
+       
         $search=$request->search['value'];
         $columnIndex = $request->order[0]['column'];
         $columnName = $request->columns[$columnIndex]['data'];
         $columnSortOrder = $request->order[0]['dir'];
         
         $total=Produk::with('transaksi')->count();      
-        $produk=Produk::with('transaksi')->with('kategori')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
+        
         $output['draw']=$draw;
         $output['recordsTotal']=$total;
         $output['recordsFiltered']=$total;
         $output['data']=[];  
-      
+        $request->length> 0 ? $length=$request->length:$length=$total;
+        $request->length> 0 ? $start = $request->input('start'):$start=0;
+        $produk=Produk::with(['transaksi'=>function($q) use ($request){
+            return $q->when($request->startdate!='' && $request->enddate!='',function($q) use($request){
+                return $q->whereDate('finishtime','<=',$request->enddate)
+                ->whereDate('finishtime','>=',$request->startdate);
+            });
+        }])->with('kategori')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
         if (!empty($search)){
             $produk=Produk::with('kategori')->whereHas('transaksi')
                 ->where('kode','LIKE',"%$search%")
@@ -42,7 +48,12 @@ class ProdukController extends Controller
                ->orWhere('tipe_komisi','LIKE',"%$search%")
                ->orWhere('komisi','LIKE',"%$search%")->orWhereHas('transaksi',function($q) use ($search){
                    return $q->where('kode','LIKE',"%$search%")->orWhere('nopol','LIKE',"%$search%");
-               })->with('transaksi')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
+               })->with(['transaksi'=>function($q) use ($request){
+                   $q->when($request->startdate!='' && $request->enddate!='',function($q) use($request){
+                    return $q->whereDate('finishtime','<=',$request->enddate)
+                    ->whereDate('finishtime','>=',$request->startdate);
+                });
+               }])->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
                $output['recordsTotal']=$produk->count();
                $output['recordsFiltered']=$produk->count();
        }  

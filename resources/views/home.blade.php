@@ -24,17 +24,15 @@
     <section class="content">
         <div class="container-fluid">
             <!-- Info boxes -->
+            @if(Auth::user()->hasRole('admin') or Auth::user()->hasRole('kasir'))
             <div class="row">
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box">
-                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-cog"></i></span>
+                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-chart-area"></i></span>
 
                         <div class="info-box-content">
-                            <span class="info-box-text">CPU Traffic</span>
-                            <span class="info-box-number">
-                  10
-                  <small>%</small>
-                </span>
+                            <span class="info-box-text">Transaksi Tertinggi</span>
+                            <span class="info-box-number"><h2><a href="{{ url('transaksi/detail/').'/'.$maxtrx->kode }}"> {{ $maxtrx->kode }}</a></h2></span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -43,11 +41,11 @@
                 <!-- /.col -->
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box mb-3">
-                        <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-thumbs-up"></i></span>
+                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
 
                         <div class="info-box-content">
-                            <span class="info-box-text">Likes</span>
-                            <span class="info-box-number">41,410</span>
+                            <span class="info-box-text">Transaksi Bulan Ini</span>
+                            <span class="info-box-number"><h2><a href="{{ url('transaksi/t/selesai').'/'.\Carbon\Carbon::now()->startOfMonth()->format('Y-m-d').'/'.\Carbon\Carbon::now()->endOfMonth()->format('Y-m-d') }}">{{ $monthtrx }}</a></h2></span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -63,8 +61,8 @@
                         <span class="info-box-icon bg-success elevation-1"><i class="fas fa-shopping-cart"></i></span>
 
                         <div class="info-box-content">
-                            <span class="info-box-text">Sales</span>
-                            <span class="info-box-number">760</span>
+                            <span class="info-box-text">Transaksi Hari Ini</span>
+                            <span class="info-box-number"><h2><a href="{{ url('transaksi/t/selesai').'/'.\Carbon\Carbon::now()->format('Y-m-d').'/'.\Carbon\Carbon::now()->format('Y-m-d') }}">{{ $todaytrx==0 ? "Kosong":$todaytrx }}</a></h2></span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -73,73 +71,39 @@
                 <!-- /.col -->
                 <div class="col-12 col-sm-6 col-md-3">
                     <div class="info-box mb-3">
-                        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-users"></i></span>
+                        <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-cart-arrow-down"></i></span>
 
                         <div class="info-box-content">
-                            <span class="info-box-text">New Members</span>
-                            <span class="info-box-number">2,000</span>
+                            <span class="info-box-text">Transaksi Pending</span>
+                            <span class="info-box-number"><h2><a href="{{ url('transaksi/t/pending')}}">{{ $pending }}</a></h2></span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
                     <!-- /.info-box -->
                 </div>
                 <!-- /.col -->
-            </div>
-            <!-- /.row -->
-
-            <div class="row">
-
-                <!-- /.col -->
-            </div>
-            <!-- /.row -->
-
-            <!-- Main row -->
+            </div>           
             <div class="row">
                 <!-- Left col -->
 
                 <!-- /.col -->
-
-                <div class="col-md-4">
+               
+                <div class="col-md-2">
                     <!-- Info Boxes Style 2 -->
+                    <h2>Stok < 10</h2>
+                    @foreach($hbs as $prd)
                     <div class="info-box mb-3 bg-warning">
                         <span class="info-box-icon"><i class="fas fa-tag"></i></span>
 
                         <div class="info-box-content">
-                            <span class="info-box-text">Inventory</span>
-                            <span class="info-box-number">5,200</span>
+                            <span class="info-box-text">{{ $prd->nama }}</span>
+                            <span class="info-box-number">{{ $prd->stok }}</span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
+                    @endforeach
                     <!-- /.info-box -->
-                    <div class="info-box mb-3 bg-success">
-                        <span class="info-box-icon"><i class="far fa-heart"></i></span>
-
-                        <div class="info-box-content">
-                            <span class="info-box-text">Mentions</span>
-                            <span class="info-box-number">92,050</span>
-                        </div>
-                        <!-- /.info-box-content -->
-                    </div>
-                    <!-- /.info-box -->
-                    <div class="info-box mb-3 bg-danger">
-                        <span class="info-box-icon"><i class="fas fa-cloud-download-alt"></i></span>
-
-                        <div class="info-box-content">
-                            <span class="info-box-text">Downloads</span>
-                            <span class="info-box-number">114,381</span>
-                        </div>
-                        <!-- /.info-box-content -->
-                    </div>
-                    <!-- /.info-box -->
-                    <div class="info-box mb-3 bg-info">
-                        <span class="info-box-icon"><i class="far fa-comment"></i></span>
-
-                        <div class="info-box-content">
-                            <span class="info-box-text">Direct Messages</span>
-                            <span class="info-box-number">163,921</span>
-                        </div>
-                        <!-- /.info-box-content -->
-                    </div>
+                    
                     <!-- /.info-box -->
 
 
@@ -151,6 +115,91 @@
                 </div>
                 <!-- /.col -->
             </div>
+            <div class="row">
+                <!-- Left col -->
+
+                <!-- /.col -->
+               
+                <div class="col-md-2">
+                    <!-- Info Boxes Style 2 -->
+                    <h2>Kendaraan</h2>
+                    
+                    <div class="info-box mb-3 bg-success">
+                        <span class="info-box-icon"><i class="fas fa-car"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Kendaraan Masuk</span>
+                            <span class="info-box-number">{{ $total }}</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <div class="info-box mb-3 bg-success">
+                        <span class="info-box-icon"><i class="fas fa-car"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Kendaraan Terakhir</span>
+                            <span class="info-box-number">{{ $last->nopol }}</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    
+                    <!-- /.info-box -->
+                    
+                    <!-- /.info-box -->
+
+
+                    <!-- /.card -->
+
+                    <!-- PRODUCT LIST -->
+
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+            </div>
+            @endif
+            @if(Auth::user()->hasRole('konter'))
+            <div class="row">
+                <!-- Left col -->
+
+                <!-- /.col -->
+               
+                <div class="col-md-2">
+                    <!-- Info Boxes Style 2 -->
+                    <h2>Kendaraan</h2>
+                    
+                    <div class="info-box mb-3 bg-success">
+                        <span class="info-box-icon"><i class="fas fa-car"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Kendaraan Masuk</span>
+                            <span class="info-box-number">{{ $total }}</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <div class="info-box mb-3 bg-success">
+                        <span class="info-box-icon"><i class="fas fa-car"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-text">Kendaraan Terakhir</span>
+                            <span class="info-box-number">{{ $last->nopol }}</span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    
+                    <!-- /.info-box -->
+                    
+                    <!-- /.info-box -->
+
+
+                    <!-- /.card -->
+
+                    <!-- PRODUCT LIST -->
+
+                    <!-- /.card -->
+                </div>
+                <!-- /.col -->
+            </div>
+            @endif
             <!-- /.row -->
         </div><!--/. container-fluid -->
     </section>
