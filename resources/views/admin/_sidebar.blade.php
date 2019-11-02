@@ -48,14 +48,20 @@
             <ul class="nav nav-treeview">
                 <li class="nav-item">
                     <a href="{{ url('transaksi/t/selesai') }}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
+                        <i class="far fa-check-circle nav-icon"></i>
                         <p>Transaksi Selesai</p>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a href="{{ url('transaksi/t/pending') }}" class="nav-link">
-                        <i class="far fa-circle nav-icon"></i>
+                        <i class="far fa-stop-circle nav-icon"></i>
                         <p>Transaksi Pending</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url('transaksi/laporan') }}" class="nav-link">
+                        <i class="far fa-file-excel nav-icon"></i>
+                        <p>Laporan</p>
                     </a>
                 </li>
             </ul>

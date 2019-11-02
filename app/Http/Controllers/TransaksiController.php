@@ -10,6 +10,59 @@ use Illuminate\Support\Facades\Auth;
 class TransaksiController extends Controller
 {
     //
+
+    public function laporantrx(Request $request){
+        $draw=$request->draw;
+       
+        $search=$request->search['value'];
+        $columnIndex = $request->order[0]['column'];
+        $columnName = $request->columns[$columnIndex]['data'];
+        $columnSortOrder = $request->order[0]['dir'];
+        
+        $total=Transaksi::with('produk')->when(($request->startdate!='' && $request->enddate !=''),function($q) use ($request){
+            return $q->whereDate('finishtime','>=',$request->startdate)->whereDate('finishtime','<=',$request->enddate);
+        })->where('status','=','selesai')->count();
+        
+        $output['draw']=$draw;
+        $output['recordsTotal']=$total;
+        $output['recordsFiltered']=$total;
+        $output['data']=[];  
+        $request->length> 0 ? $length=$request->length:$length=$total;
+        $request->length> 0 ? $start = $request->input('start'):$start=0;
+        
+        $transaksi=Transaksi::with('produk')->when(($request->startdate!='' && $request->enddate !=''),function($q) use ($request){
+            return $q->whereDate('finishtime','>=',$request->startdate)->whereDate('finishtime','<=',$request->enddate);
+        })->where('status','=','selesai')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();    
+        if(!empty($search)){
+            $transaksi=Transaksi::with(['produk'=>function($q) use ($search){
+                return $q->where('name','LIKE',"%$search%");
+            }])->where('kode','LIKE',"%$search%")
+                ->orhWhere('nopol','LIKE',"%$search%")
+                ->orWhere('total','LIKE',"%$search%")
+                ->when(($request->startdate!='' && $request->enddate !=''),function($q) use ($request){
+                    return $q->whereDate('finishtime','>=',$request->startdate)->whereDate('finishtime','<=',$request->enddate);
+            })->where('status','=','selesai')->offset($start)->limit($length)->orderBy($columnName,$columnSortOrder)->get();
+            $output['recordsTotal']=$transaksi->count();
+            $output['recordsFiltered']=$transaksi->count();
+        }
+            foreach ($transaksi as $k=>$trx){
+                $prds=[];
+                $subdata['id']=$k+1;
+                $subdata['kode']=$trx->kode;                   
+                $subdata['nopol']=$trx->nopol;
+                foreach($trx->produk as $prd){
+                    array_push($prds,$prd->nama."   x ".$prd->pivot->jumlah);
+                }
+                $produk=implode("<br>\r",$prds);
+                $subdata['produk']=$produk;
+                $subdata['total']=$trx->total;
+                $output['data'][]=$subdata;        
+            }
+            return response(json_encode($output)); 
+    }
+    public function laporan($startdate=null,$enddate=null){
+        return view('kasir.transaksi.laporan',['startdate'=>$startdate,'enddate'=>$enddate]);
+    }
     public function index($tipe,$startdate=null,$enddate=null){            
         return view('kasir.transaksi.index',['tipe'=>$tipe,'startdate'=>$startdate,'enddate'=>$enddate]);
     }

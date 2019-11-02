@@ -32,7 +32,7 @@
 
                         <div class="info-box-content">
                             <span class="info-box-text">Transaksi Tertinggi</span>
-                            <span class="info-box-number"><h2><a href="{{ url('transaksi/detail/').'/'.$maxtrx->kode }}"> {{ $maxtrx->kode }}</a></h2></span>
+                            <span class="info-box-number"><a href="{{ url('transaksi/detail/').'/'.$maxtrx->kode }}"> {{ $maxtrx->kode }}</a></span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -45,7 +45,7 @@
 
                         <div class="info-box-content">
                             <span class="info-box-text">Transaksi Bulan Ini</span>
-                            <span class="info-box-number"><h2><a href="{{ url('transaksi/t/selesai').'/'.\Carbon\Carbon::now()->startOfMonth()->format('Y-m-d').'/'.\Carbon\Carbon::now()->endOfMonth()->format('Y-m-d') }}">{{ $monthtrx }}</a></h2></span>
+                            <span class="info-box-number"><a href="{{ url('transaksi/t/selesai').'/'.\Carbon\Carbon::now()->startOfMonth()->format('Y-m-d').'/'.\Carbon\Carbon::now()->endOfMonth()->format('Y-m-d') }}">{{ $monthtrx }}</a></span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -62,7 +62,7 @@
 
                         <div class="info-box-content">
                             <span class="info-box-text">Transaksi Hari Ini</span>
-                            <span class="info-box-number"><h2><a href="{{ url('transaksi/t/selesai').'/'.\Carbon\Carbon::now()->format('Y-m-d').'/'.\Carbon\Carbon::now()->format('Y-m-d') }}">{{ $todaytrx==0 ? "Kosong":$todaytrx }}</a></h2></span>
+                            <span class="info-box-number"><a href="{{ url('transaksi/t/selesai').'/'.\Carbon\Carbon::now()->format('Y-m-d').'/'.\Carbon\Carbon::now()->format('Y-m-d') }}">{{ $todaytrx==0 ? "Kosong":$todaytrx }}</a></span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -75,7 +75,7 @@
 
                         <div class="info-box-content">
                             <span class="info-box-text">Transaksi Pending</span>
-                            <span class="info-box-number"><h2><a href="{{ url('transaksi/t/pending')}}">{{ $pending }}</a></h2></span>
+                            <span class="info-box-number"><a href="{{ url('transaksi/t/pending')}}">{{ $pending }}</a></span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>
@@ -138,7 +138,7 @@
 
                         <div class="info-box-content">
                             <span class="info-box-text">Kendaraan Terakhir</span>
-                            <span class="info-box-number">{{ $last->nopol }}</span>
+                            <span class="info-box-number">{{ $last ? $last->nopol:'' }}</span>
                         </div>
                         <!-- /.info-box-content -->
                     </div>

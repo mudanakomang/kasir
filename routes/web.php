@@ -47,6 +47,8 @@ Route::group(['middleware'=>['auth']],function (){
     Route::post('transaksi/printtrx','PrintController@printtrx')->name('printtrx');
     Route::get('transaksi/testprint','PrintController@testprint')->name('testprint');
     Route::post('transaksi/finish','TransaksiController@finish')->name('finish');
+    Route::get('transaksi/laporan/{start?}/{end?}','TransaksiController@laporan')->name('laporan');
+    Route::post('transaksi/laporantrx','TransaksiController@laporantrx')->name('laporantrx');
 
 });
 Route::group(['prefix'=>'admin','middleware'=>['auth']],function(){
@@ -56,8 +58,8 @@ Route::group(['prefix'=>'admin','middleware'=>['auth']],function(){
         $trxtertinggi=\App\Transaksi::orderBy('total','desc')->first();
         $pending=\App\Transaksi::where('status','=','pending')->count();
         $hbs=\App\Produk::where('stok','<',10)->get();
-        $total=\App\Kendaraan::count();
-        $last=\App\Kendaraan::orderBy('created_at','desc')->first();
+        $total=\App\Kendaraan::whereDay('created_at',date('d'))->count();
+        $last=\App\Kendaraan::whereDay('created_at','=',date('d'))->orderBy('created_at','desc')->first();
         return view('home',['todaytrx'=>$todaytrx,'monthtrx'=>$monthtrx,'maxtrx'=>$trxtertinggi,'pending'=>$pending,'hbs'=>$hbs,'total'=>$total,'last'=>$last]);
     })->name('admin');
     Route::get('karyawan','KaryawanController@index')->name('karyawan');
