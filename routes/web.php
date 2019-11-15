@@ -97,6 +97,7 @@ Route::group(['prefix'=>'admin','middleware'=>['auth']],function(){
     Route::get('produk/edit/{id}','ProdukController@edit')->name('editproduk');
     Route::post('produk/update/{id}','ProdukController@update')->name('updateproduk');
     Route::post('getkodeproduk','ProdukController@getkodeproduk')->name('getkodeproduk');
+    Route::post('updatestok','ProdukController@updatestok')->name('updatestok');
 
 });
 Route::group(['prefix'=>'kasir','middleware'=>['auth']],function(){

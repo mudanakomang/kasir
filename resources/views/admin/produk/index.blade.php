@@ -103,6 +103,12 @@
                     render:function (data) {
                         return data.charAt(0).toUpperCase() + data.slice(1)
                     }
+                },{
+                    targets:4,
+                    render:function(data,type,row){
+                        var id=row['id']                        
+                        return data  + "+ <input type=number name=jumlah style=width:45px id="+id+" value='' autocomplete='off' onchange='updateStok(this.id,this.value)'  min=0 >"
+                    }
                 }]
             })
         }
@@ -110,6 +116,19 @@
             loadProduk()
         })
 
+        function updateStok(id,val){
+            $.ajax({
+                url:'{{ route('updatestok') }}',
+                type:'POST',
+                data:{
+                    _token:'{{ csrf_token() }}',
+                    id:id,
+                    val:val
+                },success:function(d){
+                    $('#produk').DataTable().ajax.reload();
+                }
+            })
+        }
         function deleteProduk(id) {
             Swal.fire({
                 title: 'Apakah Anda yakin?',

@@ -16,6 +16,13 @@ class ProdukController extends Controller
     public function terjual(){
         return view('admin.produk.terjual');
     }
+    public function updatestok(Request $request){
+        $produk=\App\Produk::find($request->id);
+        $stoklama=$produk->stok;
+        $stokbaru=$stoklama+$request->val;
+        $produk->update(['stok'=>$stokbaru]);
+        return response(['status'=>'ok','data'=>$produk->stok]);
+    }
     public function produkterjual(Request $request){
         $draw=$request->draw;
        
