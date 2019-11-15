@@ -69,12 +69,15 @@ function loadTransaksi(startdate='',enddate=''){
             "dom": 'lBfrtip',
             "buttons": [{
                 extend:'excel',
+                exportOptions:{orthogonal:'export'},
                 title:'Transaksi-'+ moment().format('YYYYMMDD')        
             },{
                 extend:'pdf',
+                exportOptions:{orthogonal:'export'},
                 title:'Transaksi-'+ moment().format('YYYYMMDD')        
             },{
                 extend:'csv',
+                exportOptions:{orthogonal:'export'},
                 title:'Transaksi-'+ moment().format('YYYYMMDD')        
             }
                // , 'pdf','csv','copy'
