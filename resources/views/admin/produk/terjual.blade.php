@@ -68,13 +68,19 @@
                 dom:'lBfrtip',
                 buttons:[{
                     extend:'excel',
-                    title:'Produk Terjual '+moment().format('YYYYMMDD')
+                    title:'Produk Terjual '+moment().format('YYYYMMDD'),
+                    text:'<i class="far fa-file-excel"></i> EXCEL',
+                    footer:true
                 },{
                     extend:'pdf',
-                    title:'Produk Terjual '+moment().format('YYYYMMDD')
+                    title:'Produk Terjual '+moment().format('YYYYMMDD'),
+                    text:'<i class="far fa-file-pdf"></i> PDF',
+                    footer:true
                 },{
                     extend:'csv',
-                    title:'Produk Terjual '+moment().format('YYYYMMDD')
+                    title:'Produk Terjual '+moment().format('YYYYMMDD'),
+                    text:'<i class="fa fa-file-csv"></i> CSV',
+                    footer:true
                 }],
                 serverSide:true,
                 ordering:true,
