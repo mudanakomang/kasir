@@ -50,6 +50,16 @@
                                 <th>Produk</th>                              
                                 <th>Total Belanja</th>                                                                                                            
                                 </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                        <th style="text-align:right">Total Rp.</th>
+                                        <th style="text-align:left"></th>  
+                                                                              
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -65,19 +75,41 @@ function loadTransaksi(startdate='',enddate=''){
             "dom": 'lBfrtip',
             "buttons": [{
                 extend:'excel',
+                text:'<i class="far fa-file-excel"></i> EXCEL',
                 exportOptions:{orthogonal:'export'},
-                title:'Laporan Transaksi-'+ moment().format('YYYYMMDD')        
+                title:'Laporan Transaksi-'+ moment().format('YYYYMMDD'),
+                footer:true       
             },{
                 extend:'pdf',
                 exportOptions:{orthogonal:'export'},
-                title:'Laporan Transaksi-'+ moment().format('YYYYMMDD')        
+                text:'<i class="far fa-file-pdf"></i> PDF',
+                title:'Laporan Transaksi-'+ moment().format('YYYYMMDD'),
+                footer:true      
             },{
                 extend:'csv',
                 exportOptions:{orthogonal:'export'},
-                title:'Laporan Transaksi-'+ moment().format('YYYYMMDD')        
+                text:'<i class="fa fa-file-csv"></i> CSV',
+                title:'Laporan Transaksi-'+ moment().format('YYYYMMDD') ,
+                footer:true      
             }
                // , 'pdf','csv','copy'
             ],
+            "footerCallback":function(row,data,start,end,display){
+                  var api=this.api();data;
+                  var intVal=function(i){
+                    return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '')*1 :
+                            typeof i === 'number' ?
+                                i : 0;
+                  };
+                  total =api.column(4).data().reduce( function (a, b) { 
+                    return intVal(a) + intVal(b);
+                  }, 0 );                
+                  $(api.column(4).footer()).html(
+                    $.number(total,0,'.')
+                  );
+                  
+            },
             "autoWidth": true,
             "processing": true,
             "serverSide": true,
