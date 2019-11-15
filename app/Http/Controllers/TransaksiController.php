@@ -118,7 +118,9 @@ class TransaksiController extends Controller
                 return $q->whereDate('finishtime','<=',$request->enddate)
                          ->whereDate('finishtime','>=',$request->startdate);
             })->offset($start)->limit($limit)->where('status','=',$request->tipe)->orderBy($order,$dir)->get();
-          
+            if(!empty($request->finishtime) && !empty($request->finishtime)){
+                $totalFiltered=count($trx);
+            } 
         }
         $data=[];
         if(!empty($trx)){
@@ -131,7 +133,7 @@ class TransaksiController extends Controller
                 $subdata['tipe_byr']=$prd->tipe_byr;
                 $subdata['total']=$prd->total;
                 $subdata['jumlah_byr']=$prd->jumlah_byr;
-                $subdata['tanggal']=\Carbon\Carbon::parse($prd->created_at)->format('Y/m/d H:i');   
+                $subdata['tanggal']=\Carbon\Carbon::parse($prd->finishtime)->format('Y/m/d H:i');   
                 $subdata['kasir']=$prd->user->name;        
                 $data[]=$subdata;
             }

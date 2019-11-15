@@ -63,21 +63,21 @@
 function loadTransaksi(startdate='',enddate=''){
       var t=  $('#transaksi').DataTable({
             "dom": 'lBfrtip',
-            "buttons": [{
-                extend:'excel',
-                exportOptions:{orthogonal:'export'},
-                title:'Transaksi-'+ moment().format('YYYYMMDD')        
-            },{
-                extend:'pdf',
-                exportOptions:{orthogonal:'export'},
-                title:'Transaksi-'+ moment().format('YYYYMMDD')        
-            },{
-                extend:'csv',
-                exportOptions:{orthogonal:'export'},
-                title:'Transaksi-'+ moment().format('YYYYMMDD')        
-            }
-               // , 'pdf','csv','copy'
-            ],
+            // "buttons": [{
+            //     extend:'excel',
+            //     exportOptions:{orthogonal:'export'},
+            //     title:'Transaksi-'+ moment().format('YYYYMMDD')        
+            // },{
+            //     extend:'pdf',
+            //     exportOptions:{orthogonal:'export'},
+            //     title:'Transaksi-'+ moment().format('YYYYMMDD')        
+            // },{
+            //     extend:'csv',
+            //     exportOptions:{orthogonal:'export'},
+            //     title:'Transaksi-'+ moment().format('YYYYMMDD')        
+            // }
+            //    // , 'pdf','csv','copy'
+            // ],
             "autoWidth": true,
             "processing": true,
             "serverSide": true,
