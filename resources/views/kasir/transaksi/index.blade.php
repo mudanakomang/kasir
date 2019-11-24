@@ -52,6 +52,7 @@
                                 <th>Total Belanja</th>
                                 <th>Jumlah Pembayaran</th>                                
                                 <th>Tanggal</th>
+                                <th>Handle</th>
                                 <th>Kasir</th>
                                 </thead>
                                 <tfoot>
@@ -60,8 +61,12 @@
                                             <th></th>
                                             <th></th>
                                             <th></th>
-                                            <th style="text-align:right">Total Rp.</th>
+                                            <th style="text-align:right">Total Cash: </th>
+                                            <th style="text-align:left"></th>
+                                            <th style="text-align:right">Total Debit: </th>
                                             <th style="text-align:left"></th> 
+                                            <th style="text-align:right">Total: </th>
+                                            <th style="text-align:left"></th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -106,12 +111,32 @@ function loadTransaksi(startdate='',enddate=''){
                             typeof i === 'number' ?
                                 i : 0;
                   };
-                  total =api.column(5).data().reduce( function (a, b) { 
+                  totalcash =api.column(5).data().reduce( function (a, b, idx) {                      
+                    if(api.column(4).data()[idx] == 'cash'){
+                        return intVal(a) + intVal(b);
+                    } else {
+                        return a
+                    }                  
+                  }, 0 ); 
+                  totaldebit =api.column(5).data().reduce( function (a, b, idx) {                   
+                    if(api.column(4).data()[idx] == 'debit'){
+                        return intVal(a) + intVal(b);
+                    } else {
+                        return a
+                    }                  
+                  }, 0 );
+                  total =api.column(5).data().reduce( function (a, b) {                               
                     return intVal(a) + intVal(b);
-                  }, 0 );                
+                  }, 0 );   
                   $(api.column(5).footer()).html(
-                    $.number(total,0,'.')
-                  );
+                    $.number(totalcash,0,'.',',')
+                  );   
+                  $(api.column(7).footer()).html(
+                    $.number(totaldebit,0,'.',',')
+                  );            
+                  $(api.column(9).footer()).html(
+                    $.number(total,0,'.',',')
+                  );                
                   
             },
             "autoWidth": true,
@@ -141,7 +166,8 @@ function loadTransaksi(startdate='',enddate=''){
                 {"data":"tipe_byr"},
                 {"data":"total"},
                 {"data":"jumlah_byr"}, 
-                {"data":"tanggal"},    
+                {"data":"tanggal"}, 
+                {"data":"guide"},   
                 {"data":"kasir"},           
             ],"columnDefs":[{
                     "targets":[5,6],

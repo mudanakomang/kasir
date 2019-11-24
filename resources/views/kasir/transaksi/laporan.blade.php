@@ -47,15 +47,26 @@
                                 <th>No</th>
                                 <th>Kode</th>
                                 <th>No Polisi</th>
-                                <th>Produk</th>                              
-                                <th>Total Belanja</th>                                                                                                            
+                                <th>Produk</th>  
+                                <th>Tipe Pembayaran</th>
+                                <th>Harga Satuan</th>  
+                                <th>Diskon</th>                              
+                                <th>Total Belanja</th>    
+                                <th>Handle</th>  
+                                <th>Kasir</th>
+                                <th>Tanggal</th>                                                                                                        
                                 </thead>
                                 <tfoot>
                                     <tr>
                                         <th></th>
                                         <th></th>
                                         <th></th>
-                                        <th style="text-align:right">Total Rp.</th>
+                                        <th></th>
+                                        <th style="text-align:right">Total Cash</th>
+                                        <th style="text-align:left"></th> 
+                                        <th style="text-align:right">Total Debit</th>
+                                        <th style="text-align:left"></th> 
+                                        <th style="text-align:right">Total</th>
                                         <th style="text-align:left"></th>  
                                                                               
                                     </tr>
@@ -84,6 +95,7 @@ function loadTransaksi(startdate='',enddate=''){
                 exportOptions:{orthogonal:'export'},
                 text:'<i class="far fa-file-pdf"></i> PDF',
                 title:'Laporan Transaksi-'+ moment().format('YYYYMMDD'),
+                orientation: 'landscape',
                 footer:true      
             },{
                 extend:'csv',
@@ -102,11 +114,31 @@ function loadTransaksi(startdate='',enddate=''){
                             typeof i === 'number' ?
                                 i : 0;
                   };
-                  total =api.column(4).data().reduce( function (a, b) { 
+                  totalcash =api.column(7).data().reduce( function (a, b, idx) {                      
+                    if(api.column(4).data()[idx] == 'cash'){
+                        return intVal(a) + intVal(b);
+                    } else {
+                        return a
+                    }                  
+                  }, 0 ); 
+                  totaldebit =api.column(7).data().reduce( function (a, b, idx) {                   
+                    if(api.column(4).data()[idx] == 'debit'){
+                        return intVal(a) + intVal(b);
+                    } else {
+                        return a
+                    }                  
+                  }, 0 );
+                  total =api.column(7).data().reduce( function (a, b) { 
                     return intVal(a) + intVal(b);
-                  }, 0 );                
-                  $(api.column(4).footer()).html(
-                    $.number(total,0,'.')
+                  }, 0 );  
+                  $(api.column(5).footer()).html(
+                    $.number(totalcash,0,'.',',')
+                  );   
+                  $(api.column(7).footer()).html(
+                    $.number(totaldebit,0,'.',',')
+                  );                   
+                  $(api.column(9).footer()).html(
+                    $.number(total,0,'.',',')
                   );
                   
             },
@@ -133,13 +165,23 @@ function loadTransaksi(startdate='',enddate=''){
                 {"data":"kode"},
                 {"data":"nopol"},  
                 {"data":"produk",render:function(data,type,row){                    
-                    return type==='export' ? data.replace("<br>",""): " "+data
+                    return type==='export' ? data: " "+data
                   }
-                },                    
+                },
+                {"data":"tipe_byr"},   
+                {"data":"harga",render:function(data,type,row){
+                    return type==='export' ? data: " "+data
+                }},  
+                {"data":"diskon",render:function(data,type,row){
+                    return type==='export' ? data: " "+data
+                }},                
                 {"data":"total"},
+                {"data":"guide"},
+                {"data":"kasir"},
+                {"data":"tanggal"}
              
             ],"columnDefs":[{
-                    "targets":4,
+                    "targets":7,
                     "render": $.fn.dataTable.render.number( '.', ',', 0,'Rp. ' )
                 },{
                     "targets":1,
@@ -147,6 +189,9 @@ function loadTransaksi(startdate='',enddate=''){
                     "render":function(data,type,row){
                         return "<a href='{{ url('transaksi/detail')}}/"+data+"'>"+data+"</a>"
                     }
+                },{
+                    "targets":3,
+                    "orderable": false,
                 }
             ]        
         })
